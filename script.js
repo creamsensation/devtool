@@ -1,7 +1,9 @@
 (() => {
+	let MOVE_LS_KEY = '__devtool_position__'
 	let activeClass = "is-active"
 	let retryLimit = 30
 	let retryCount = 0
+	let loaded = false
 	
 	function getPopup(id) {
 		return document.querySelector(`[data-devtool-popup="${id}"]`)
@@ -69,8 +71,6 @@
 		el.classList.add('is-'+status)
 	}
 	
-	
-	
 	function initConnection() {
 		if (retryCount >= retryLimit) {
 			setInfoStatus('app', 'fail')
@@ -79,16 +79,11 @@
 		}
 		let connection = new WebSocket(window.location.origin.replace("http", "ws") + "/_development")
 		connection.onopen = function (e) {
-			setInfoStatus('app', 'ok')
-		}
-		connection.onmessage = function (e) {
-			if (typeof e.data !== 'string') {
-				return
-			}
-			if (e.data === '<assets:ok>') {
-				setInfoStatus('assets', 'ok')
+			if (loaded) {
 				window.location.href = window.location.href
 			}
+			loaded = true
+			setInfoStatus('app', 'ok')
 		}
 		connection.onclose = (e) => {
 			connection = null
@@ -100,8 +95,22 @@
 		return connection
 	}
 	
+	function initResize() {
+		const devtool = document.querySelector('.devtool')
+		if (!devtool) {
+			return
+		}
+		let debounce = null
+		window.addEventListener('resize', function(e) {
+			clearTimeout(debounce)
+			debounce = setTimeout(() => {
+				window.localStorage.removeItem(MOVE_LS_KEY)
+				devtool.removeAttribute('style')
+			}, 300)
+		})
+	}
+	
 	function initMovement() {
-		const MOVE_LS_KEY = '__devtool_position__'
 		const invertClass = 'invert'
 		const devtool = document.querySelector('.devtool')
 		if (!devtool) {
@@ -156,12 +165,14 @@
 	if (window.devtool) {
 		initPopups()
 		initMovement()
+		initResize()
 	}
 	
 	document.addEventListener('DOMContentLoaded', () => {
 		initPopups()
 		initConnection()
 		initMovement()
+		initResize()
 		window.devtool = true
 	})
 })()

@@ -24,6 +24,7 @@ func createView(
 	}
 	sort.Strings(routeKeys)
 	sort.Strings(sessionKeys)
+	
 	return Div(
 		Id(Selector),
 		Style(Element(), Text(style)),
@@ -31,14 +32,7 @@ func createView(
 		Div(
 			Class("devtool"),
 			Style(Text("display:none;")),
-			Div(
-				Class("devtool-title"),
-				iconBug(),
-				Div(Text("Devtool")),
-			),
-			Div(Class("devtool-infobox"), Text(renderDuration)),
-			Div(Class("devtool-infobox is-ok"), Text("App"), CustomData("devtool-app-build")),
-			Div(Class("devtool-infobox is-ok"), Text("Assets"), CustomData("devtool-assets-build")),
+			Div(Class("devtool-infobox is-ok"), Text(renderDuration), CustomData("devtool-app-build")),
 			Div(
 				Class("devtool-control"),
 				If(
