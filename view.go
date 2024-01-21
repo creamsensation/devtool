@@ -27,6 +27,7 @@ func createView(
 	
 	return Div(
 		Id(Selector),
+		CreateAttribute[string]("hx-swap-oob")("true"),
 		Style(Element(), Text(style)),
 		Script(Text(script)),
 		Div(
